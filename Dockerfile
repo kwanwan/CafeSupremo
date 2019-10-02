@@ -38,7 +38,7 @@ RUN cd /reward \
   && echo "getting wallet from ATP..."  \
   && /reward/dl.wallet.sh $ATPOCID  \
   && unzip -d wallet ./wallet.zip \
-  && sed -i 's/?\/network\/admin/$TNS_ADMIN/g'  /reward/wallet/sqlnet.ora
+  && sed -i 's/?\/network\/admin/$TNS_ADMIN/g'  /reward/wallet/sqlnet.ora \
   && npm install \
   && grunt build:release
 # we should remove the keyfile from the image
