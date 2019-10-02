@@ -1,0 +1,62 @@
+box:
+  id: alpine:3.2
+
+build:
+  box: oraclelinux:7-slim
+  steps:
+    - script:
+        name: create keyfile
+        code: |
+          echo $OCIAPIKEY_PRIVATE > temp.pem
+    - internal/docker-build:
+        build-args: "OCIUSEROCID=$OCIUSEROCID OCIAPIKEYFP=$OCIAPIKEYFP OKEY=$OCIAPIKEY_PRIVATE OCITENANTOCID=$OCITENANTOCID OCIOKEOCID=$OCIOKEOCID OCIENDPOINT=$OCIENDPOINT OCIREGION=$OCIREGION DB_ADMIN_USER=$DB_ADMIN_USER DBPASSWORD=$DBPASSWORD DB_DESCRIPTOR=$DB_DESCRIPTOR" 
+        dockerfile: Dockerfile
+        image-name: cndoke
+    - internal/docker-push:
+        image-name: cndoke
+        username: $DOCKER_USERNAME
+        password: $DOCKER_PASSWORD
+        repository: $DOCKER_REPO
+        registry: $DOCKER_REGISTRY
+        tag: latest, $WERCKER_GIT_BRANCH-$WERCKER_GIT_COMMIT
+        ports: 80
+        env: LD_LIBRARY_PATH=/opt/oracle/instantclient_19_3 TNS_ADMIN=/reward/wallet WALLET_LOCATION=/reward/wallet
+        cmd: node server.js
+
+deploy:
+  box:
+    id: alpine
+    cmd: /bin/sh
+  steps:
+    - bash-template
+
+    - kubectl:
+        name: apply namespace
+        server: $KUBERNETES_MASTER
+        token: $KUBERNETES_TOKEN
+        insecure-skip-tls-verify: true
+        command: apply -f ./ns.yml
+    - kubectl:
+        name: delete OCR secret
+        server: $KUBERNETES_MASTER
+        token: $KUBERNETES_TOKEN
+        insecure-skip-tls-verify: true
+        command: delete secret wrelease --namespace=$NS --ignore-not-found=true
+    - kubectl:
+        name: create OCR secret
+        server: $KUBERNETES_MASTER
+        token: $KUBERNETES_TOKEN
+        insecure-skip-tls-verify: true
+        command: create secret docker-registry wrelease --docker-server=$DOCKER_REGISTRY --docker-username=$DOCKER_USERNAME --docker-password="$DOCKER_PASSWORD" --docker-email=${WERCKER_APPLICATION_OWNER_NAME}@mail.com --namespace=$NS
+    - kubectl:
+        name: apply deplyoment
+        server: $KUBERNETES_MASTER
+        token: $KUBERNETES_TOKEN
+        insecure-skip-tls-verify: true
+        command: apply -f ./cndoke-deploy.yml --namespace=$NS
+    - kubectl:
+        name: apply service
+        server: $KUBERNETES_MASTER
+        token: $KUBERNETES_TOKEN
+        insecure-skip-tls-verify: true
+        command: apply -f ./cndoke-service.yml --namespace=$NS
