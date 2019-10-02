@@ -1,19 +1,26 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: rewardservice
+  name: cndoke
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        app: rewardservice
+        app: cndoke
     spec:
       containers:
-      - name: rewardservice
+      - name: cndoke
         image: $DOCKER_REPO:$WERCKER_GIT_BRANCH-$WERCKER_GIT_COMMIT
         ports:
         - containerPort: 80
+        env:
+        - name: DB_ADMIN_USER
+          value: $DB_ADMIN_USER
+        - name: DBPASSWORD
+          value: $DBPASSWORD
+        - name: DB_DESCRIPTOR
+          value: $DB_DESCRIPTOR
         resources:
           requests:
             memory: 500Mi
