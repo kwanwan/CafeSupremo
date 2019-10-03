@@ -330,11 +330,66 @@ router.route('/v1/activatereward/').get(function (request, response) {
   response.json(responseBody);
 });
 
-router.route('/v1/resetdb').post(function (request,response) {
+app.post('/initdb/resetdb', function (request,response) {
   console.log("reset or init db");
+  console.log("db user received: " + request.body.username);
+  console.log("db password received: " + request.body.password);
   // place holder for the function to init the db
-  var responseBody = { "message": "DB is being initialized, please grab a coffee and come back!"};
-  response.json(resonseBody);
+  var responseBody = { "message": "Table created with one record"};
+  response.json(responseBody);
+  var initDBConn = {
+    user: request.body.username,
+    password: request.body.password,
+    connectString: process.env.DB_DESCRIPTOR
+  };
+  oracledb.getConnection(initDBConn, function(err,connection)
+  {
+     if (err) {
+       console.log("db connection error");
+     }
+     console.log("drop table, error might be fine");
+     connection.execute("DROP TABLE customer", function(err,result) {
+       if (err) {
+         console.log("drop table error");
+       }
+       var createStatement = "CREATE TABLE CUSTOMER ( ID NUMBER, ";
+           createStatement += "FIRSTNAME VARCHAR2(255), SURNAME VARCHAR2(255), ";
+           createStatement += "ADDRESS VARCHAR2(255), CARDNUM VARCHAR2(255), ";
+           createStatement += "POINTS NUMBER(*,0), COUPONS NUMBER(*,0), ";
+           createStatement += "UNAME VARCHAR2(255), PASSWORD VARCHAR2(255), ";
+           createStatement += "PRIMARY KEY(ID) )";
+       connection.execute(createStatement, function(err, result) {
+         if (err) {
+           console.log("create table error");
+         }
+         var insertStatement = "INSERT INTO CUSTOMER values ";
+             insertStatement += "(30001,'Lisa','Jones','64 Church Crescent, UK',";
+             insertStatement += "'1111222233334444',1,6,'user@email.com','Oracle123')";
+         connection.execute(insertStatement, function(err, result) {
+           if (err) {
+             console.log("insert record error");
+           }
+           connection.close();
+         })
+
+       })
+
+     })
+  });
+
+
+
+
+
+});
+
+router.route('/initdb.html').get(function (request,response) {
+  console.log("init db form starts here");
+  // place holder for the function to init the db
+  var responseBody = "<html><body bgcolor=000000>";
+  responseBody += "<font color=white face=arial>Please enter DB username/password:</font>";
+  responseBody += "<form method=post action=/initdb/resetdb><input type=text name=username /><input type=password name=password /><input type=submit name=submit style='color: white'></body></html>";
+  response.send(responseBody);
 });
 
 // serving H5 client under web folder
