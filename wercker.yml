@@ -1,0 +1,24 @@
+box:
+  id: alpine:3.2
+
+build:
+  box: oraclelinux:7-slim
+  steps:
+    - script:
+        name: create keyfile
+        code: |
+          echo $OCIAPIKEY_PRIVATE > temp.pem
+    - internal/docker-build:
+        build-args: "OCIUSEROCID=$OCIUSEROCID OCIAPIKEYFP=$OCIAPIKEYFP OKEY=$OCIAPIKEY_PRIVATE OCITENANTOCID=$OCITENANTOCID OCIOKEOCID=$OCIOKEOCID OCIENDPOINT=$OCIENDPOINT OCIREGION=$OCIREGION DB_ADMIN_USER=$DB_ADMIN_USER DBPASSWORD=$DBPASSWORD DB_DESCRIPTOR=$DB_DESCRIPTOR ATPOCID=$ATPOCID"
+        dockerfile: Dockerfile
+        image-name: cndoke
+    - internal/docker-push:
+        image-name: cndoke
+        username: $DOCKER_USERNAME
+        password: $DOCKER_PASSWORD
+        repository: $DOCKER_REPO
+        registry: $DOCKER_REGISTRY
+        tag: latest, $WERCKER_GIT_BRANCH-$WERCKER_GIT_COMMIT
+        ports: 80
+        env: LD_LIBRARY_PATH=/opt/oracle/instantclient_19_3 TNS_ADMIN=/reward/wallet WALLET_LOCATION=/reward/wallet
+        cmd: node server.js
