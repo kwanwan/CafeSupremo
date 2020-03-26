@@ -11,9 +11,9 @@ build:
     - internal/docker-build:
         build-args: "OCIUSEROCID=$OCIUSEROCID OCIAPIKEYFP=$OCIAPIKEYFP OKEY=$OCIAPIKEY_PRIVATE OCITENANTOCID=$OCITENANTOCID OCIOKEOCID=$OCIOKEOCID OCIENDPOINT=$OCIENDPOINT OCIREGION=$OCIREGION DB_ADMIN_USER=$DB_ADMIN_USER DBPASSWORD=$DBPASSWORD DB_DESCRIPTOR=$DB_DESCRIPTOR ATPOCID=$ATPOCID"
         dockerfile: Dockerfile
-        image-name: cafesupremo
+        image-name: cndoke
     - internal/docker-push:
-        image-name: cafesupremo
+        image-name: cndoke
         username: $DOCKER_USERNAME
         password: $DOCKER_PASSWORD
         repository: $DOCKER_REPO
@@ -53,10 +53,10 @@ deploy:
         server: $KUBERNETES_MASTER
         token: $KUBERNETES_TOKEN
         insecure-skip-tls-verify: true
-        command: apply -f ./cafesupremo-deploy.yml --namespace=$NS
+        command: apply -f ./cndoke-deploy.yml --namespace=$NS
     - kubectl:
         name: apply service
         server: $KUBERNETES_MASTER
         token: $KUBERNETES_TOKEN
         insecure-skip-tls-verify: true
-        command: apply -f ./cafesupremo-service.yml --namespace=$NS
+        command: apply -f ./cndoke-service.yml --namespace=$NS
