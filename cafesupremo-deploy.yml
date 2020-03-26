@@ -1,16 +1,16 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: cndoke
+  name: cafesupremo
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        app: cndoke
+        app: cafesupremo
     spec:
       containers:
-      - name: cndoke
+      - name: cafesupremo
         image: $DOCKER_REPO:$WERCKER_GIT_BRANCH-$WERCKER_GIT_COMMIT
         ports:
         - containerPort: 80
