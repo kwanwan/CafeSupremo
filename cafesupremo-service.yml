@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: cndoke
+  name: cafesupremo
   labels:
-    app: cndoke
+    app: cafesupremo
 spec:
   type: LoadBalancer
   ports:
   - port: 80
   selector:
-    app: cndoke
+    app: cafesupremo
