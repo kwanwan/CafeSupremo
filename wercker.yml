@@ -11,9 +11,9 @@ build:
     - internal/docker-build:
         build-args: "OCIUSEROCID=$OCIUSEROCID OCIAPIKEYFP=$OCIAPIKEYFP OKEY=$OCIAPIKEY_PRIVATE OCITENANTOCID=$OCITENANTOCID OCIOKEOCID=$OCIOKEOCID OCIENDPOINT=$OCIENDPOINT OCIREGION=$OCIREGION DB_ADMIN_USER=$DB_ADMIN_USER DBPASSWORD=$DBPASSWORD DB_DESCRIPTOR=$DB_DESCRIPTOR ATPOCID=$ATPOCID"
         dockerfile: Dockerfile
-        image-name: cndoke
+        image-name: cafesupremo
     - internal/docker-push:
-        image-name: cndoke
+        image-name: cafesupremo
         username: $DOCKER_USERNAME
         password: $DOCKER_PASSWORD
         repository: $DOCKER_REPO
