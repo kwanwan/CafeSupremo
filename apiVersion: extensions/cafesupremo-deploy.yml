@@ -1,0 +1,33 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: cafesupremo
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: cafesupremo
+    spec:
+      containers:
+      - name: cafesupremo
+        image: $DOCKER_REPO:$WERCKER_GIT_BRANCH-$WERCKER_GIT_COMMIT
+        ports:
+        - containerPort: 80
+        env:
+        - name: DB_ADMIN_USER
+          value: $DB_ADMIN_USER
+        - name: DBPASSWORD
+          value: $DBPASSWORD
+        - name: DB_DESCRIPTOR
+          value: $DB_DESCRIPTOR
+        resources:
+          requests:
+            memory: 500Mi
+            cpu: 0.5
+          limits:
+            memory: 500Mi
+            cpu: 0.5
+        imagePullPolicy: Always
+      imagePullSecrets:
+      - name: wrelease
